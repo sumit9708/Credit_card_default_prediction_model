@@ -1,1 +1,12 @@
 Flask
+gunicorn
+pandas
+numpy
+sklearn
+dill
+six
+-e .
+PyYAML
+ipykernel
+requests
+ipywidgets
