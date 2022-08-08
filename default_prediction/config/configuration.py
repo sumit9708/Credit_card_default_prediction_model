@@ -6,12 +6,14 @@ from default_prediction.constant import *
 from default_prediction.util.util import read_yaml_file
 from default_prediction.logger import logging
 
+
 class Configuration:
     def __init__(self):
         try:
             self.config_info = read_yaml_file(file_path=CONFIG_FILE_PATH)
             self.training_pipeline_config =  self.get_training_pipeline_config()
             self.time_stamp = get_current_time_stamp()
+            
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
 
@@ -56,6 +58,8 @@ class Configuration:
             )
             logging.info(f"data_ingestion_config is : [{data_ingestion_config}]")
 
+            print(data_ingestion_config)
+
             return data_ingestion_config
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
@@ -77,6 +81,8 @@ class Configuration:
             return training_pipeline_config
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
+
+    print("data_ingestion_log_completed")
 
     def new_method(self):
         training_pipeline_config = self.config_info[TRAINING_PIPELINE_CONFIG_KEY]
