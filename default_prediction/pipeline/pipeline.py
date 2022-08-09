@@ -1,4 +1,5 @@
 from tkinter import E
+from default_prediction.component.data_transformation import DataTransformation
 from default_prediction.component.data_validation import DataValidation
 from default_prediction.config.configuration import Configuration
 from default_prediction.constant import *
@@ -6,7 +7,7 @@ from default_prediction.exception import ExceptionHandler
 import os,sys
 from default_prediction.logger import logging
 
-from default_prediction.entity.config_artifact import DataIngestionArtifact, DataValidationArtifact
+from default_prediction.entity.config_artifact import DataIngestionArtifact, DataTransformationArtifact, DataValidationArtifact
 from default_prediction.entity.config_entity import DataIngestionConfig,DataValidationConfig
 from default_prediction.component.data_ingestion import DataIngestion
 
@@ -34,8 +35,14 @@ class Pipeline:
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
 
-    def start_data_transformation(self):
-        pass
+    def start_data_transformation(self,data_ingestion_artifact:DataIngestionArtifact,data_validation_artifact:DataValidationArtifact)->DataTransformationArtifact:
+        try:
+            data_transformation = DataTransformation(data_transformation_config=self.config.get_data_transformation_config(),
+            data_ingestion_artifact=data_ingestion_artifact,data_validation_artifact=data_validation_artifact
+            )
+            return data_transformation.initiate_data_transformation()
+        except Exception as e:
+            raise ExceptionHandler(e,sys) from e
 
     def start_model_trainer(self):
         pass
@@ -53,8 +60,10 @@ class Pipeline:
             # Data Ingestion
             data_ingestion_artifact = self.start_data_ingestion()
             data_validation_artifact = self.start_data_validation(data_ingestion_artifact=data_ingestion_artifact)
-
-            return data_ingestion_artifact,data_validation_artifact
+            data_transformation_artifact = self.start_data_transformation(data_ingestion_artifact=data_ingestion_artifact,
+                                                            data_validation_artifact=data_validation_artifact
+            )
+            return data_ingestion_artifact,data_validation_artifact,data_transformation_artifact
 
         except Exception as e:
             raise ExceptionHandler(e,sys) from e

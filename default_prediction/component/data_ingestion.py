@@ -9,6 +9,8 @@ from default_prediction.entity.config_entity import DataIngestionConfig
 import shutil
 import pandas as pd
 import numpy as np
+from default_prediction.util.util import read_yaml_file
+from default_prediction.constant import *
 
 print("reached in data_ingestion inside component")
 
@@ -88,7 +90,13 @@ class DataIngestion:
 
             logging.info(f"file_path is :[{file_path}]")
 
+            schema_file_path = self.data_ingestion_config.schema_file_path
+
+            schema = read_yaml_file(file_path=schema_file_path)
+
             default_prediction_dataframe = pd.read_csv(file_path)
+
+            default_prediction_dataframe.columns = schema[COLUMNS_KEY]
 
             train_set = default_prediction_dataframe[:120000]
 

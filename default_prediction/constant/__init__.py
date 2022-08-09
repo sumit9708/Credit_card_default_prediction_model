@@ -10,7 +10,8 @@ CONFIG_DIR = "config"
 CONFIG_FILE_NAME = "config.yaml"
 CONFIG_FILE_PATH = os.path.join(ROOT_DIR,CONFIG_DIR,CONFIG_FILE_NAME)
 SCHEMA_FILE_NAME = "schema.yaml"
-
+SCHEMA_DIR_KEY = "config"
+ 
 ## Training pipeline related variable
 
 TRAINING_PIPELINE_CONFIG_KEY = "training_pipeline_config"
@@ -45,3 +46,18 @@ DATA_VALIDATION_SCHEMA_FILE_NAME_KEY = "schema_file_name"
 DATA_VALIDATION_REPORT_FILE_NAME_KEY = "report_file_name"
 DATA_VALIDATION_REPORT_PAGE_FILE_NAME_KEY = "report_page_file_name"
 
+## data transformation related constants :-
+
+DATA_TRANSFORMATION_CONFIG_KEY = "data_transformation_config"
+DATA_TRANSFORMATION_ARTIFACT_DIR_NAME = "data_transformation"
+DATA_TRANSFORMATION_TRANSFORMED_DIR_KEY = "transformed_dir"
+DATA_TRANSFORMATION_TRANSFORMED_TRAIN_DIR_KEY = "transformed_train_dir"
+DATA_TRANSFORMATION_TRANSFORMED_TEST_DIR_KEY = "transformed_test_dir"
+DATA_TRANSFORMATION_PREPROCESSED_DIR_KEY = "preprocessing_dir"
+DATA_TRANSFORMATION_PREPROCESSED_OBJECT_FILE_NAME_KEY = "preprocessed_object_file_name"
+
+## schema file related constants:-
+
+DATASET_SCHEMA_COLUMNS_KEY = "columns"
+NUMERICAL_COLUMNS_KEY = "numerical_columns"
+TARGET_COLUMN_KEY = "target_column"
