@@ -19,7 +19,7 @@ class DataIngestion:
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
 
-    def get_dowloaded_data(self):
+    def get_dowloaded_data(self,)->str:
         try:
             logging.info("--------------data ingestion log inside component started----------------")
             download_url = self.data_ingestion_config.data_download_url
@@ -28,8 +28,8 @@ class DataIngestion:
 
             csv_download_dir = self.data_ingestion_config.csv_download_dir
 
-        #    if os.path.exists(csv_download_dir):
-        #        os.remove(csv_download_dir)
+            if os.path.exists(csv_download_dir):
+                os.remove(csv_download_dir)
 
             os.makedirs(csv_download_dir,exist_ok=True)
 
@@ -50,19 +50,19 @@ class DataIngestion:
         try:
             raw_data_dir = self.data_ingestion_config.raw_data_dir
 
-        #    if os.path.exists(raw_data_dir):
-        #        os.remove(raw_data_dir)
+            if os.path.exists(raw_data_dir):
+                os.remove(raw_data_dir)
             os.makedirs(raw_data_dir,exist_ok=True)
 
-            csv_file_path = self.get_dowloaded_data()
-
             csv_download_dir = self.data_ingestion_config.csv_download_dir
+ 
+            csv_file_path = self.get_dowloaded_data()
 
             file_name = os.listdir(csv_download_dir)[0]
 
             file_path = os.path.join(raw_data_dir,file_name)
 
-            shutil.copy(csv_file_path,file_path)
+            shutil.copy(csv_file_path,raw_data_dir)
 
             raw_data_dir_file = os.listdir(raw_data_dir)[0]
 
@@ -101,6 +101,7 @@ class DataIngestion:
 
     def initiate_data_ingestion(self)->DataIngestionArtifact:
         try:
+            
             train_set,test_set = self.split_into_train_and_test_data()
 
             ingested_test_dir = self.data_ingestion_config.ingested_test_dir
@@ -109,7 +110,7 @@ class DataIngestion:
             ingested_train_dir = self.data_ingestion_config.ingested_train_dir
             logging.info(f"ingested_train_dir is :[{ingested_train_dir}]")
 
-            raw_data_dir = self.get_raw_csv_data()
+            #raw_data_dir = self.get_raw_csv_data()
 
             raw_data_dir = self.data_ingestion_config.raw_data_dir
             file_name = os.listdir(raw_data_dir)[0]
@@ -118,18 +119,18 @@ class DataIngestion:
 
             logging.info(f"train_file_path is :[{train_file_path}]")
 
-            os.makedirs(train_file_path,exist_ok=True)
+            os.makedirs(self.data_ingestion_config.ingested_train_dir,exist_ok=True)
             
             test_file_path = os.path.join(ingested_test_dir,file_name)
             logging.info(f"test_file_path is :[{test_file_path}]")
 
-            os.makedirs(test_file_path,exist_ok=True)
+            os.makedirs(self.data_ingestion_config.ingested_test_dir,exist_ok=True)
             
             logging.info(f"Exporting Training Dataset To file:[{train_file_path}]")
 
-            train_set.to_csv(train_file_path+".csv")
+            train_set.to_csv(train_file_path,index=False)
 
-            test_set.to_csv(test_file_path+".csv")
+            test_set.to_csv(test_file_path,index=False)
 
             is_ingested = True
 

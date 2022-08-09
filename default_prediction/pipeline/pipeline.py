@@ -1,12 +1,13 @@
 from tkinter import E
+from default_prediction.component.data_validation import DataValidation
 from default_prediction.config.configuration import Configuration
 from default_prediction.constant import *
 from default_prediction.exception import ExceptionHandler
 import os,sys
 from default_prediction.logger import logging
 
-from default_prediction.entity.config_artifact import DataIngestionArtifact
-from default_prediction.entity.config_entity import DataIngestionConfig
+from default_prediction.entity.config_artifact import DataIngestionArtifact, DataValidationArtifact
+from default_prediction.entity.config_entity import DataIngestionConfig,DataValidationConfig
 from default_prediction.component.data_ingestion import DataIngestion
 
 class Pipeline:
@@ -17,16 +18,19 @@ class Pipeline:
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
 
-    def start_data_ingestion(self)->DataIngestionArtifact:
+    def start_data_ingestion(self,)->DataIngestionArtifact:
         try:
             data_ingestion = DataIngestion(data_ingestion_config=self.config.get_data_ingestion_config())
             return data_ingestion.initiate_data_ingestion()
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
 
-    def start_data_validation(self):
+    def start_data_validation(self,data_ingestion_artifact:DataIngestionArtifact)->DataValidationArtifact:
         try:
-            pass
+            data_ingestion_artifact = data_ingestion_artifact
+
+            data_validation = DataValidation(data_ingestion_artifact=data_ingestion_artifact,data_validation_config=self.config.get_data_validation_config())
+            return data_validation.initiate_data_validation()
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
 
@@ -45,8 +49,12 @@ class Pipeline:
 
     def run_pipeline(self):
         try:
+            
             # Data Ingestion
             data_ingestion_artifact = self.start_data_ingestion()
+            data_validation_artifact = self.start_data_validation(data_ingestion_artifact=data_ingestion_artifact)
+
+            return data_ingestion_artifact,data_validation_artifact
 
         except Exception as e:
             raise ExceptionHandler(e,sys) from e

@@ -10,3 +10,4 @@ PyYAML
 ipykernel
 requests
 ipywidgets
+evidently

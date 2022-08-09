@@ -6,11 +6,11 @@ from default_prediction.config.configuration import Configuration
 def main():
     try:
 
-        #pipeline = Pipeline()
-        #pipeline.run_pipeline()
-        config = Configuration()
+        pipeline = Pipeline()
+        pipeline.run_pipeline()
+        #config = Configuration()
 
-        return config.get_data_validation_config()
+        #return config.get_data_validation_config()
     except Exception as e:
         logging.error(f"{e}")
         print(e)
