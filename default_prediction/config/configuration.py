@@ -1,6 +1,6 @@
 import os,sys
 from collections import namedtuple
-from default_prediction.entity.config_entity import DataIngestionConfig, DataTransformationConfig, DataValidationConfig, ModelTrainerConfig, TrainingPipelineConfig
+from default_prediction.entity.config_entity import DataIngestionConfig, DataTransformationConfig, DataValidationConfig, ModelEvaluationConfig, ModelTrainerConfig, TrainingPipelineConfig
 from default_prediction.exception import ExceptionHandler
 from default_prediction.constant import *
 from default_prediction.util.util import read_yaml_file
@@ -66,7 +66,7 @@ class Configuration:
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
 
-    def get_data_validation_config(self):
+    def get_data_validation_config(self)->DataValidationConfig:
 
         try:
 
@@ -108,7 +108,7 @@ class Configuration:
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
 
-    def get_data_transformation_config(self):
+    def get_data_transformation_config(self)->DataTransformationConfig:
         try:
             logging.info("------------------data transformation config log started-----------------")
             artifact_dir = self.training_pipeline_config.artifact_dir
@@ -154,7 +154,7 @@ class Configuration:
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
 
-    def get_model_trainer_config(self):
+    def get_model_trainer_config(self)->ModelTrainerConfig:
         try:
 
             logging.info("---------------model trainer config log started-------------------")
@@ -194,9 +194,35 @@ class Configuration:
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
 
-    def get_model_evaluation_config(self):
+    def get_model_evaluation_config(self)->ModelEvaluationConfig:
         try:
-            pass
+
+            logging.info("-------------------model evaluation config log started------------------------")
+            artifact_dir = self.training_pipeline_config.artifact_dir
+
+            model_evaluation_artifact = os.path.join(artifact_dir,
+            MODEL_EVALUATION_ARTIFACT_DIR_NAME,
+            self.time_stamp
+            )
+
+            logging.info(f"model_evaluation_artifact is : [{model_evaluation_artifact}]")
+
+            self.model_evaluation_config = self.config_info[MODEL_EVALUATION_CONFIG_KEY]
+
+            model_evaluation_file_path = os.path.join(model_evaluation_artifact,
+            self.model_evaluation_config[MODEL_EVALUATION_FILE_NAME_KEY]
+            )
+
+            logging.info(f"model_evaluation_file_path : [{model_evaluation_file_path}]")
+
+            response = ModelEvaluationConfig(model_evaluation_file_path=model_evaluation_file_path,
+                                            time_stamp=self.time_stamp)
+            
+            
+            logging.info(f"Model Evaluation Config: {response}.")
+
+            return response
+
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
 

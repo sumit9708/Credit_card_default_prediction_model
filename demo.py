@@ -8,9 +8,9 @@ def main():
 
         pipeline = Pipeline()
         pipeline.run_pipeline()
-        #config = Configuration()
+        # config = Configuration()
 
-        #return config.get_model_trainer_config()
+        # return config.get_model_evaluation_config()
     except Exception as e:
         logging.error(f"{e}")
         print(e)

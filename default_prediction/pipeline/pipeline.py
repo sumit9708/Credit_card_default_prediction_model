@@ -1,6 +1,7 @@
 from tkinter import E
 from default_prediction.component.data_transformation import DataTransformation
 from default_prediction.component.data_validation import DataValidation
+from default_prediction.component.model_evaluation import ModelEvaluation
 from default_prediction.component.model_training import ModelTrainer
 from default_prediction.config.configuration import Configuration
 from default_prediction.constant import *
@@ -8,8 +9,8 @@ from default_prediction.exception import ExceptionHandler
 import os,sys
 from default_prediction.logger import logging
 
-from default_prediction.entity.config_artifact import DataIngestionArtifact, DataTransformationArtifact, DataValidationArtifact
-from default_prediction.entity.config_entity import DataIngestionConfig,DataValidationConfig
+from default_prediction.entity.config_artifact import DataIngestionArtifact, DataTransformationArtifact, DataValidationArtifact, ModelEvaluationArtifact,ModelTrainerArtifact,ModelPusherArtifact
+from default_prediction.entity.config_entity import DataIngestionConfig,DataValidationConfig,DataTransformationConfig,ModelTrainerConfig,ModelEvaluationConfig,ModelPusherConfig
 from default_prediction.component.data_ingestion import DataIngestion
 
 class Pipeline:
@@ -52,8 +53,13 @@ class Pipeline:
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
 
-    def start_model_evaluation(self):
-        pass
+    def start_model_evaluation(self,data_ingestion_artifact: DataIngestionArtifact, data_validation_artifact: DataValidationArtifact, model_trainer_artifact: ModelTrainerArtifact)->ModelEvaluationArtifact:
+        try:
+            model_evaluation = ModelEvaluation(model_evaluation_config=self.config.get_model_evaluation_config(),data_ingestion_artifact=data_ingestion_artifact,data_validation_artifact=data_validation_artifact,model_trainer_artifact=model_trainer_artifact)
+
+            return model_evaluation.initiate_model_evaluation()
+        except Exception as e:
+            raise ExceptionHandler(e,sys) from e
 
     def start_model_pusher(self):
         pass
@@ -70,7 +76,11 @@ class Pipeline:
             )
 
             model_trainer_artifact = self.start_model_trainer(data_transformation_artifact=data_transformation_artifact)
-            return data_ingestion_artifact,data_validation_artifact,data_transformation_artifact,model_trainer_artifact
+
+            model_evaluation_artifact = self.start_model_evaluation(data_ingestion_artifact=data_ingestion_artifact,data_validation_artifact=data_validation_artifact,model_trainer_artifact=model_trainer_artifact)
+
+            
+            return data_ingestion_artifact,data_validation_artifact,data_transformation_artifact,model_trainer_artifact,model_evaluation_artifact
 
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
