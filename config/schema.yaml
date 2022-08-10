@@ -4,13 +4,13 @@ columns:
   SeriousDlqin2yrs : int
   RevolvingUtilizationOfUnsecuredLines : float
   age: int
-  NumberOfTime30-59DaysPastDueNotWorse : int
+  NumberOfTime30_to_59DaysPastDueNotWorse : int
   DebtRatio : float
   MonthlyIncome : float
   NumberOfOpenCreditLinesAndLoans : int
   NumberOfTimes90DaysLate : int
   NumberRealEstateLoansOrLines : int
-  NumberOfTime60-89DaysPastDueNotWorse : int
+  NumberOfTime60_to_89DaysPastDueNotWorse : int
   NumberOfDependents : float
 
 
@@ -18,13 +18,13 @@ numerical_columns:
   - CustomerID
   - RevolvingUtilizationOfUnsecuredLines
   - age
-  - NumberOfTime30-59DaysPastDueNotWorse
+  - NumberOfTime30_to_59DaysPastDueNotWorse
   - DebtRatio
   - MonthlyIncome
   - NumberOfOpenCreditLinesAndLoans
   - NumberOfTimes90DaysLate
   - NumberRealEstateLoansOrLines
-  - NumberOfTime60-89DaysPastDueNotWorse
+  - NumberOfTime60_to_89DaysPastDueNotWorse
   - NumberOfDependents
 
 #categorical_columns:

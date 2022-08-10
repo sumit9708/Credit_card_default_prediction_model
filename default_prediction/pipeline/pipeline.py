@@ -1,6 +1,7 @@
 from tkinter import E
 from default_prediction.component.data_transformation import DataTransformation
 from default_prediction.component.data_validation import DataValidation
+from default_prediction.component.model_training import ModelTrainer
 from default_prediction.config.configuration import Configuration
 from default_prediction.constant import *
 from default_prediction.exception import ExceptionHandler
@@ -44,8 +45,12 @@ class Pipeline:
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
 
-    def start_model_trainer(self):
-        pass
+    def start_model_trainer(self,data_transformation_artifact:DataTransformationArtifact):
+        try:
+            model_training = ModelTrainer(model_trainer_config=self.config.get_model_trainer_config(),data_transformation_artifact=data_transformation_artifact)
+            return model_training.initiate_model_trainer()
+        except Exception as e:
+            raise ExceptionHandler(e,sys) from e
 
     def start_model_evaluation(self):
         pass
@@ -63,7 +68,9 @@ class Pipeline:
             data_transformation_artifact = self.start_data_transformation(data_ingestion_artifact=data_ingestion_artifact,
                                                             data_validation_artifact=data_validation_artifact
             )
-            return data_ingestion_artifact,data_validation_artifact,data_transformation_artifact
+
+            model_trainer_artifact = self.start_model_trainer(data_transformation_artifact=data_transformation_artifact)
+            return data_ingestion_artifact,data_validation_artifact,data_transformation_artifact,model_trainer_artifact
 
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
