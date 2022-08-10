@@ -11,7 +11,6 @@ class DefaulterData:
 
     def __init__(self,
                  CustomerID : int,
-                 SeriousDlqin2yrs : int,
                  RevolvingUtilizationOfUnsecuredLines : float,
                  age: int,
                  NumberOfTime30_to_59DaysPastDueNotWorse : int,
@@ -21,11 +20,11 @@ class DefaulterData:
                  NumberOfTimes90DaysLate : int,
                  NumberRealEstateLoansOrLines : int,
                  NumberOfTime60_to_89DaysPastDueNotWorse : int,
-                 NumberOfDependents : float
+                 NumberOfDependents : float,
+                 SeriousDlqin2yrs : int = None
                  ):
         try:
             self.CustomerID = CustomerID
-            self.SeriousDlqin2yrs = SeriousDlqin2yrs
             self.RevolvingUtilizationOfUnsecuredLines = RevolvingUtilizationOfUnsecuredLines
             self.age = age
             self.NumberOfTime30_to_59DaysPastDueNotWorse = NumberOfTime30_to_59DaysPastDueNotWorse
@@ -36,6 +35,7 @@ class DefaulterData:
             self.NumberRealEstateLoansOrLines = NumberRealEstateLoansOrLines
             self.NumberOfTime60_to_89DaysPastDueNotWorse = NumberOfTime60_to_89DaysPastDueNotWorse
             self.NumberOfDependents = NumberOfDependents
+            self.SeriousDlqin2yrs = SeriousDlqin2yrs
         except Exception as e:
             raise ExceptionHandler(e, sys) from e
 
