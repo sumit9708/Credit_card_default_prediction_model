@@ -2,6 +2,7 @@ from tkinter import E
 from default_prediction.component.data_transformation import DataTransformation
 from default_prediction.component.data_validation import DataValidation
 from default_prediction.component.model_evaluation import ModelEvaluation
+from default_prediction.component.model_pusher import ModelPusher
 from default_prediction.component.model_training import ModelTrainer
 from default_prediction.config.configuration import Configuration
 from default_prediction.constant import *
@@ -61,8 +62,13 @@ class Pipeline:
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
 
-    def start_model_pusher(self):
-        pass
+    def start_model_pusher(self,model_evaluation_artifact: ModelEvaluationArtifact)->ModelPusherArtifact:
+        try:
+            model_pusher = ModelPusher(model_pusher_config=self.config.get_model_pusher_config(),model_evaluation_artifact=model_evaluation_artifact)
+
+            return model_pusher.initiate_model_pusher()
+        except Exception as e:
+            raise ExceptionHandler(e,sys) from e
 
 
     def run_pipeline(self):
@@ -79,8 +85,10 @@ class Pipeline:
 
             model_evaluation_artifact = self.start_model_evaluation(data_ingestion_artifact=data_ingestion_artifact,data_validation_artifact=data_validation_artifact,model_trainer_artifact=model_trainer_artifact)
 
+            model_pusher_artifact = self.start_model_pusher(model_evaluation_artifact=model_evaluation_artifact)
+
             
-            return data_ingestion_artifact,data_validation_artifact,data_transformation_artifact,model_trainer_artifact,model_evaluation_artifact
+            return data_ingestion_artifact,data_validation_artifact,data_transformation_artifact,model_trainer_artifact,model_evaluation_artifact,model_pusher_artifact
 
         except Exception as e:
             raise ExceptionHandler(e,sys) from e

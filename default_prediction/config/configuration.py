@@ -1,6 +1,6 @@
 import os,sys
 from collections import namedtuple
-from default_prediction.entity.config_entity import DataIngestionConfig, DataTransformationConfig, DataValidationConfig, ModelEvaluationConfig, ModelTrainerConfig, TrainingPipelineConfig
+from default_prediction.entity.config_entity import DataIngestionConfig, DataTransformationConfig, DataValidationConfig, ModelEvaluationConfig, ModelPusherConfig, ModelTrainerConfig, TrainingPipelineConfig
 from default_prediction.exception import ExceptionHandler
 from default_prediction.constant import *
 from default_prediction.util.util import read_yaml_file
@@ -226,8 +226,18 @@ class Configuration:
         except Exception as e:
             raise ExceptionHandler(e,sys) from e
 
-    def get_model_pusher_config(self):
-        pass
+    def get_model_pusher_config(self)->ModelPusherConfig:
+        try:
+            time_stamp = f"{datetime.now().strftime('%Y%m%d%H%M%S')}"
+            model_pusher_config_info = self.config_info[MODEL_PUSHER_CONFIG_KEY]
+            export_dir_path = os.path.join(ROOT_DIR, model_pusher_config_info[MODEL_PUSHER_MODEL_EXPORT_DIR_KEY],
+                                           time_stamp)
+
+            model_pusher_config = ModelPusherConfig(export_dir_path=export_dir_path)
+            logging.info(f"Model pusher config {model_pusher_config}")
+            return model_pusher_config
+        except Exception as e:
+            raise ExceptionHandler(e,sys) from e
 
     def get_training_pipeline_config(self)->TrainingPipelineConfig:
         try:
