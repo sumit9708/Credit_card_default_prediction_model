@@ -5,8 +5,8 @@ from typing import List
 from default_prediction.entity.config_artifact import DataTransformationArtifact, ModelTrainerArtifact
 from default_prediction.entity.config_entity import ModelTrainerConfig
 from default_prediction.util.util import load_numpy_array_data,save_object,load_object
-from default_prediction.entity.model_factory import MetricInfoArtifact, ModelFactory,GridSearchedBestModel
-from default_prediction.entity.model_factory import evaluate_regression_model
+from default_prediction.entity.model_factory import MetricInfoArtifactCategorical, ModelFactory,GridSearchedBestModel
+from default_prediction.entity.model_factory import evaluate_classification_model
 
 
 
@@ -82,7 +82,7 @@ class ModelTrainer:
             
             model_list = [model.best_model for model in grid_searched_best_model_list ]
             logging.info(f"Evaluation all trained model on training and testing dataset both")
-            metric_info:MetricInfoArtifact = evaluate_regression_model(model_list=model_list,X_train=x_train,y_train=y_train,X_test=x_test,y_test=y_test,base_accuracy=base_accuracy)
+            metric_info:MetricInfoArtifactCategorical = evaluate_classification_model(model_list=model_list,X_train=x_train,y_train=y_train,X_test=x_test,y_test=y_test,base_accuracy=base_accuracy)
 
             logging.info(f"Best found model on both training and testing dataset.")
             
@@ -91,18 +91,18 @@ class ModelTrainer:
 
 
             trained_model_file_path=self.model_trainer_config.trained_model_file_path
-            housing_model = DefaulterEstimatorModel(preprocessing_object=preprocessing_obj,trained_model_object=model_object)
+            default_prediction_model = DefaulterEstimatorModel(preprocessing_object=preprocessing_obj,trained_model_object=model_object)
             logging.info(f"Saving model at path: {trained_model_file_path}")
-            save_object(file_path=trained_model_file_path,obj=housing_model)
+            save_object(file_path=trained_model_file_path,obj=default_prediction_model)
 
 
             model_trainer_artifact=  ModelTrainerArtifact(is_trained=True,message="Model Trained successfully",
             trained_model_file_path=trained_model_file_path,
-            train_rmse=metric_info.train_rmse,
-            test_rmse=metric_info.test_rmse,
+            train_confusion_matrix=metric_info.train_confusion_matrix,
+            test_confusion_matrix=metric_info.test_confusion_matrix,
             train_accuracy=metric_info.train_accuracy,
             test_accuracy=metric_info.test_accuracy,
-            model_accuracy=metric_info.model_accuracy
+            model_accuracy=metric_info.final_model_accuracy
             
             )
 

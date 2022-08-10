@@ -195,7 +195,10 @@ class Configuration:
             raise ExceptionHandler(e,sys) from e
 
     def get_model_evaluation_config(self):
-        pass
+        try:
+            pass
+        except Exception as e:
+            raise ExceptionHandler(e,sys) from e
 
     def get_model_pusher_config(self):
         pass

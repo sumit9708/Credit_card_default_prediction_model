@@ -11,6 +11,10 @@ from collections import namedtuple
 from typing import List
 from default_prediction.logger import logging
 from sklearn.metrics import r2_score,mean_squared_error
+
+from sklearn.metrics import precision_score,accuracy_score,recall_score,f1_score,confusion_matrix
+
+
 GRID_SEARCH_KEY = 'grid_search'
 MODULE_KEY = 'module'
 CLASS_KEY = 'class'
@@ -34,13 +38,17 @@ BestModel = namedtuple("BestModel", ["model_serial_number",
                                      "best_parameters",
                                      "best_score", ])
 
-MetricInfoArtifact = namedtuple("MetricInfoArtifact",
+MetricInfoArtifactNumeric = namedtuple("MetricInfoArtifactNumeric",
                                 ["model_name", "model_object", "train_rmse", "test_rmse", "train_accuracy",
                                  "test_accuracy", "model_accuracy", "index_number"])
 
+MetricInfoArtifactCategorical = namedtuple("MetricInfoArtifactCategorical",
+                                ["model_name", "model_object", "train_confusion_matrix", "test_confusion_matrix", "train_accuracy",
+                                 "test_accuracy","train_recall_score","test_recall_score","train_precision_score","test_precision_score","train_f1_score","test_f1_score","final_model_accuracy","index_number"])
 
 
-def evaluate_regression_model(model_list: list, X_train:np.ndarray, y_train:np.ndarray, X_test:np.ndarray, y_test:np.ndarray, base_accuracy:float=0.6) -> MetricInfoArtifact:
+
+def evaluate_regression_model(model_list: list, X_train:np.ndarray, y_train:np.ndarray, X_test:np.ndarray, y_test:np.ndarray, base_accuracy:float=0.6) -> MetricInfoArtifactNumeric:
     """
     Description:
     This function compare multiple regression model return best model
@@ -53,7 +61,7 @@ def evaluate_regression_model(model_list: list, X_train:np.ndarray, y_train:np.n
     return
     It retured a named tuple
     
-    MetricInfoArtifact = namedtuple("MetricInfo",
+    MetricInfoArtifactNumeric = namedtuple("MetricInfo",
                                 ["model_name", "model_object", "train_rmse", "test_rmse", "train_accuracy",
                                  "test_accuracy", "model_accuracy", "index_number"])
     """
@@ -97,7 +105,7 @@ def evaluate_regression_model(model_list: list, X_train:np.ndarray, y_train:np.n
             #we will accept that model as accepted model
             if model_accuracy >= base_accuracy and diff_test_train_acc < 0.05:
                 base_accuracy = model_accuracy
-                metric_info_artifact = MetricInfoArtifact(model_name=model_name,
+                metric_info_artifact = MetricInfoArtifactNumeric(model_name=model_name,
                                                         model_object=model,
                                                         train_rmse=train_rmse,
                                                         test_rmse=test_rmse,
@@ -115,6 +123,106 @@ def evaluate_regression_model(model_list: list, X_train:np.ndarray, y_train:np.n
         raise ExceptionHandler(e, sys) from e
 
 
+def evaluate_classification_model(model_list: list, X_train:np.ndarray, y_train:np.ndarray, X_test:np.ndarray, y_test:np.ndarray, base_accuracy:float=0.6) -> MetricInfoArtifactCategorical:
+    """
+    Description:
+    This function compare multiple regression model return best model
+    Params:
+    model_list: List of model
+    X_train: Training dataset input feature
+    y_train: Training dataset target feature
+    X_test: Testing dataset input feature
+    y_test: Testing dataset input feature
+    return
+    It retured a named tuple
+    
+    MetricInfoArtifactCategorical = namedtuple("MetricInfoArtifact",
+                                ["model_name", "model_object", "train_confusion_matrix", "test_confusion_matrix", 
+                                "train_accuracy",
+                                 "test_accuracy","train_recall_score","test_recall_score",
+                                 "train_precision_score","test_precision_score","train_f1_score",
+                                 "test_f1_score","final_model_accuracy","index_number"])
+    """
+    try:
+        
+        #model_list = [model.best_model for model in model_list]
+        index_number = 0
+        metric_info_artifact = None
+        for model in model_list:
+            model_name = str(model)  #getting model name based on model object
+            logging.info(f"{'>>'*30}Started evaluating model: [{type(model).__name__}] {'<<'*30}")
+            
+            #Getting prediction for training and testing dataset
+            y_train_pred = model.predict(X_train)
+            y_test_pred = model.predict(X_test)
+
+            #Calculating accuracy using  Confusion matrix on training and testing dataset
+            train_confusion_matrix = confusion_matrix(y_train, y_train_pred)
+            test_confusion_matrix = confusion_matrix(y_test, y_test_pred)
+            
+            #Calculating accuracy score on training and testing dataset
+            train_acc = accuracy_score(y_train, y_train_pred)
+            test_acc = accuracy_score(y_test, y_test_pred)
+
+            #Calculating recall_score on training and testing dataset
+            train_recall_score = recall_score(y_train, y_train_pred)
+            test_recall_score = recall_score(y_test, y_test_pred)
+
+            #Calculating precision_score on training and testing dataset
+            train_precision_score = precision_score(y_train, y_train_pred)
+            test_precision_score = precision_score(y_test, y_test_pred)
+
+            #Calculating f1_score on training and testing dataset
+            train_f1_score = f1_score(y_train, y_train_pred)
+            test_f1_score = f1_score(y_test, y_test_pred)
+
+            # Calculating harmonic mean of train_accuracy and test_accuracy
+            final_model_accuracy = (2 * (train_acc * test_acc)) / (train_acc + test_acc)
+            diff_test_train_acc = abs(test_acc - train_acc)
+            
+            #logging all important metric
+            logging.info(f"{'>>'*30} Score {'<<'*30}")
+            logging.info(f"Train Score\t\t Test Score\t\t Average Score")
+            logging.info(f"{train_acc}\t\t {test_acc}\t\t{final_model_accuracy}")
+
+            logging.info(f"{'>>'*30} Loss {'<<'*30}")
+            logging.info(f"Diff test train accuracy: [{diff_test_train_acc}].") 
+            logging.info(f"Train confusion matrix: [{train_confusion_matrix}].")
+            logging.info(f"Test confusion matrix: [{test_confusion_matrix}].")
+            logging.info(f"train_recall_score: [{train_recall_score}].")
+            logging.info(f"test_recall_score: [{test_recall_score}].")
+            logging.info(f"train_precision_score: [{train_precision_score}].")
+            logging.info(f"test_precision_score: [{test_precision_score}].")
+            logging.info(f"train_f1_score: [{train_f1_score}].")
+            logging.info(f"test_f1_score: [{test_f1_score}].")
+
+
+            #if model accuracy is greater than base accuracy and train and test score is within certain thershold
+            #we will accept that model as accepted model
+            if final_model_accuracy >= base_accuracy and diff_test_train_acc < 0.05:
+                base_accuracy = final_model_accuracy
+                metric_info_artifact = MetricInfoArtifactCategorical(model_name=model_name,
+                                                        model_object=model,
+                                                        train_confusion_matrix=train_confusion_matrix,
+                                                        test_confusion_matrix=test_confusion_matrix,
+                                                        train_accuracy=train_acc,
+                                                        test_accuracy=test_acc,
+                                                        train_recall_score=train_recall_score,
+                                                        test_recall_score=test_recall_score,
+                                                        train_precision_score=train_precision_score,
+                                                        test_precision_score=test_precision_score,
+                                                        train_f1_score=train_f1_score,
+                                                        test_f1_score=test_f1_score,
+                                                        final_model_accuracy=final_model_accuracy,
+                                                        index_number=index_number)
+
+                logging.info(f"Acceptable model found {metric_info_artifact}. ")
+            index_number += 1
+        if metric_info_artifact is None:
+            logging.info(f"No model found with higher accuracy than base accuracy")
+        return metric_info_artifact
+    except Exception as e:
+        raise ExceptionHandler(e, sys) from e
 def get_sample_model_config_yaml_file(export_dir: str):
     try:
         model_config = {
