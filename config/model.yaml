@@ -40,21 +40,21 @@ model_selection:
        - 3
        - 6
 
-  #module_3:
-  #    class: SVC
-  #    module: sklearn.svm
-  #    params:
-  #      degree : 3
-  #      kernel : 'rbf'
-  #      gamma  : 'scale'
-  #    search_param_grid:
-  #      degree:
-  #      - 3
-  #      - 6
-  #      kernel :
-  #      - 'rbf'
-  #      gamma :
-  #      - 'scale'
+  module_3:
+    class: SVC
+    module: sklearn.svm
+    params:
+      degree : 3
+      kernel : 'rbf'
+      gamma  : 'scale'
+    search_param_grid:
+      degree:
+      - 3
+      - 6
+      kernel :
+      - 'rbf'
+      gamma :
+      - 'scale'
 
   module_4:
     class: DecisionTreeClassifier
